@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="hero">
+    <h1>📊 Data Dashboard</h1>
+    <p>Upload your CSV or Excel file and see instant charts.</p>
+
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="upload-form">
+      <label class="file-label">
+        <input type="file" name="file" accept=".csv,.xlsx" required id="fileInput">
+        <span id="fileName">Choose file (.csv / .xlsx)</span>
+      </label>
+      <button type="submit" class="btn">Upload File</button>
+    </form>
+
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  </header>
+
+  <main class="dashboard">
+    {% if result %}
+      <section class="stats">
+        <div class="stat"><span>{{ result.rows }}</span>Rows</div>
+        <div class="stat"><span>{{ result.cols }}</span>Columns</div>
+        <div class="stat file"><span>{{ result.filename }}</span>File</div>
+      </section>
+
+      <section class="charts">
+        {% for title, chart in result.charts %}
+          <div class="card"><h3>{{ title }}</h3>{{ chart | safe }}</div>
+        {% else %}
+          <div class="card"><p>Charts generate panna numeric columns illa.</p></div>
+        {% endfor %}
+      </section>
+
+      <section class="card">
+        <h3>Clean Data (first 50 rows)</h3>
+        <div class="table-wrap">{{ result.table | safe }}</div>
+      </section>
+
+      {% if result.summary %}
+      <section class="card">
+        <h3>Summary Statistics</h3>
+        <div class="table-wrap">{{ result.summary | safe }}</div>
+      </section>
+      {% endif %}
+    {% else %}
+      <div class="placeholder">Dashboard area — file upload pannina charts inga theriyum.</div>
+    {% endif %}
+  </main>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function () {
+      document.getElementById('fileName').textContent = this.files[0] ? this.files[0].name : 'Choose file (.csv / .xlsx)';
+    });
+  </script>
+</body>
+</html>
